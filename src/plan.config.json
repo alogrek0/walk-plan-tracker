@@ -138,6 +138,7 @@
   "shoes": [
     { "id": "training", "label": "Beast (training)", "model": "Brooks Beast GTS 26", "role": "daily and pad", "notes": "Stability, GuideRails, wide, for overpronation. Adrenaline GTS 25 is the lighter-support alternative." },
     { "id": "park", "label": "Bondi 8 (park)", "model": "Hoka Bondi 8", "role": "park and long walk", "notes": "Reserved. Break-in from Sept 1 on Saturday outdoor walks only." },
+    { "id": "bondi9", "label": "Bondi 9 (blue)", "model": "Hoka Bondi 9", "role": "training and daily", "notes": "Blue pair, used for training walks." },
     { "id": "house", "label": "House (OluKai)", "model": "OluKai / Crocs", "role": "hard floors at home", "notes": "Supportive footbed to manage arch soreness on tile and hardwood." },
     { "id": "other", "label": "Other", "model": "", "role": "", "notes": "" }
   ],
