@@ -95,6 +95,9 @@
   .seg{display:flex;gap:6px;margin-top:8px;}
   .seg button{flex:1;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:4px;padding:6px 0;font-size:12px;cursor:pointer;letter-spacing:.4px;}
   .seg button.on{border-color:var(--gold-b);color:var(--gold);}
+  .shoe-select{-webkit-appearance:none;appearance:none;background:transparent;border:none;color:var(--ink);font-family:var(--serif);font-size:16px;padding:0 20px 0 0;width:100%;cursor:pointer;outline:none;line-height:1.2;}
+  .shoe-select:focus{color:var(--gold);}
+  .shoe-select option{background:var(--screen);color:var(--ink);}
 
   .panel{border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin-top:10px;}
   .panel .s-lbl{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);margin-bottom:10px;}
@@ -306,8 +309,11 @@ function renderToday(){
   h+='<button class="tile" data-action="open-steps"><div class="t-lbl">Steps</div><div class="t-val'+(log.steps==null?' empty':'')+'">'+(log.steps==null?'—':nfmt(log.steps))+'</div></button>';
   h+='<div class="tile"><div class="t-lbl">Walk min</div><div class="t-val'+(log.walkMinutes==null?' empty':'')+'" data-action="open-walk" style="cursor:pointer">'+(log.walkMinutes==null?'—':log.walkMinutes)+'</div>'
     +'<div class="seg"><button data-action="surface" data-v="pad" class="'+(log.surface==='pad'?'on':'')+'">Pad</button><button data-action="surface" data-v="outdoor" class="'+(log.surface==='outdoor'?'on':'')+'">Outdoor</button></div></div>';
-  const shoe=log.shoes?shoeById(log.shoes):null;
-  h+='<button class="tile" data-action="cycle-shoes"><div class="t-lbl">Shoes</div><div class="t-inline"><span>'+esc(shoe?shoe.label:'—')+'</span><span class="caret">▾</span></div></button>';
+  let shoeOpts='<option value=""'+(log.shoes?'':' selected')+'>—</option>';
+  cfg.shoes.forEach(s=>{shoeOpts+='<option value="'+s.id+'"'+(log.shoes===s.id?' selected':'')+'>'+esc(s.label)+'</option>';});
+  h+='<div class="tile"><div class="t-lbl">Shoes</div><div class="t-inline" style="position:relative;margin-top:4px">'
+    +'<select class="shoe-select" data-field="shoes" aria-label="Shoes">'+shoeOpts+'</select>'
+    +'<span class="caret" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);pointer-events:none">▾</span></div></div>';
   const pf=(log.painFlags||[])[0];
   const pType=pf?(cfg.painFlagTypes.find(t=>t.id===pf.type)||{}).label:'';
   h+='<button class="tile'+(pf?' pain-set':'')+'" data-action="open-pain"><div class="t-lbl">Pain flag</div><div class="t-sub">'+(pf?esc(pType)+' · '+pf.severity+' of 5':'None')+'</div></button>';
@@ -464,6 +470,7 @@ async function onClick(e){
 }
 function onChange(e){
   if(e.target.dataset.field==='bikeMin'){const v=e.target.value.trim();log.bike=log.bike||{done:false,minutes:null};log.bike.minutes=v===''?null:Math.max(0,Math.round(+v));if(log.bike.minutes)log.bike.done=true;persist();}
+  if(e.target.dataset.field==='shoes'){log.shoes=e.target.value||null;persist();}
 }
 
 let sheetTarget=null;
