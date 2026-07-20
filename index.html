@@ -206,7 +206,7 @@ const DOW=['sun','mon','tue','wed','thu','fri','sat'];
 const CFG_KEY='wpt:config', PREF_KEY='wpt:prefs';
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let cfg, db, dateStr, log, view='today';
-const ui={routineOpen:{}, painOpen:false, painType:'left_knee', setMsg:null};
+const ui={routineOpen:{}, painOpen:false, painType:'left_knee', setMsg:null, detailDate:null};
 
 const pad=n=>String(n).padStart(2,'0');
 const ymd=dt=>dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());
@@ -358,9 +358,9 @@ function renderAhead(){
   for(let k=0;k<7;k++){
     const dd=new Date(parse(dateStr));dd.setDate(dd.getDate()+k);const ds=ymd(dd);
     const day=deriveDay(ds);const sum=shortSummary(day);
-    h+='<div class="day'+(k===0?' today':'')+'"><div class="d-date"><div class="d-day">'+DOW[dd.getDay()].toUpperCase()+'</div><div class="d-num">'+dd.getDate()+'</div></div>'
+    h+='<div class="day'+(k===0?' today':'')+'" data-action="day-detail" data-date="'+ds+'" style="cursor:pointer"><div class="d-date"><div class="d-day">'+DOW[dd.getDay()].toUpperCase()+'</div><div class="d-num">'+dd.getDate()+'</div></div>'
       +'<div class="d-div"></div><div style="flex:1"><div class="d-title">'+esc(sum.title)+'</div>'
-      +(sum.detail?'<div class="d-detail">'+esc(sum.detail)+'</div>':'')+'</div></div>';
+      +(sum.detail?'<div class="d-detail">'+esc(sum.detail)+'</div>':'')+'</div><div class="chev" style="align-self:center">›</div></div>';
   }
   h+='</div>';
 
@@ -372,6 +372,38 @@ function renderAhead(){
     h+='<div class="ms"><div class="ms-lbl">'+esc(m.label)+'</div><div class="ms-when">'+when+'</div></div>';
   });
   h+='</div><div class="space"></div></section>';
+  return h;
+}
+
+/* ---------- Day detail ---------- */
+function renderDayDetail(ds){
+  const day=deriveDay(ds), dt=day.dt;
+  const titleTxt=dt.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+  const wk=Math.max(1,Math.min(day.weekNum,cfg.meta.durationWeeks));
+  const dTrip=dayDiff(ds,cfg.meta.tripDate);
+  let h='<section class="view">';
+  h+='<div style="color:var(--gold);cursor:pointer;font-size:13px;padding:2px 0 6px;letter-spacing:.3px" data-action="back-ahead">‹ Look Ahead</div>';
+  h+='<div class="head-top"><div class="la-title">'+esc(titleTxt)+'</div>'
+    +'<div class="countdown"><div class="n">'+dTrip+'</div><div class="l">days to trip</div></div></div>';
+  h+='<div class="la-sub">Week '+wk+' · <span class="phase">'+esc(day.phase.name)+'</span></div>';
+  if(day.week&&day.week.progression)h+='<div style="border-left:2px solid var(--gold-b);padding:8px 0 8px 12px;margin-top:16px;font-size:13.5px;color:var(--muted);font-style:italic;line-height:1.5">'+esc(day.week.progression)+'</div>';
+  if(day.items.length){
+    h+='<div class="eyebrow" style="margin:22px 0 10px">The day’s plan</div><div class="sessions">';
+    day.items.forEach(it=>{
+      h+='<div class="session"><div class="session-row" style="cursor:default">'
+        +'<div class="s-body"><div class="s-name">'+esc(it.title)+'</div><div class="s-meta">'+esc(it.meta)+'</div>'
+        +(it.note?'<div class="s-note">'+esc(it.note)+'</div>':'')+'</div></div>';
+      if(it.kind==='strength'){const r=cfg.routines[it.routineKey];h+='<div class="exlist">';
+        r.exercises.forEach(ex=>{h+='<div class="ex"><div style="flex:1"><div class="ex-name">'+esc(ex.name)+'</div>'
+          +(ex.cue?'<div class="ex-cue">'+esc(ex.cue)+'</div>':'')+'</div><div class="ex-sets">'+esc(ex.sets)+'</div></div>';});
+        h+='</div>';}
+      h+='</div>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div style="margin-top:22px;color:var(--dim);font-size:14px;font-style:italic">Rest day — nothing scheduled.</div>';
+  }
+  h+='<div class="space"></div></section>';
   return h;
 }
 
@@ -395,7 +427,7 @@ function renderSettings(){
 }
 
 function render(){
-  $('scroll').innerHTML=view==='today'?renderToday():view==='ahead'?renderAhead():renderSettings();
+  $('scroll').innerHTML=view==='today'?renderToday():view==='ahead'?(ui.detailDate?renderDayDetail(ui.detailDate):renderAhead()):renderSettings();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
   ui.setMsg=null;
 }
@@ -415,6 +447,8 @@ async function onClick(e){
     await persist();render();return;
   }
   if(act==='dismiss-banner'){log.bannerDismissed=true;await persist();render();return;}
+  if(act==='day-detail'){ui.detailDate=a.dataset.date;$('scroll').scrollTop=0;render();return;}
+  if(act==='back-ahead'){ui.detailDate=null;$('scroll').scrollTop=0;render();return;}
   if(act==='open-steps'){openSheet('steps');return;}
   if(act==='open-walk'){openSheet('walk');return;}
   if(act==='surface'){log.surface=log.surface===a.dataset.v?null:a.dataset.v;await persist();render();return;}
@@ -458,7 +492,7 @@ function saveConfig(){
   catch(err){ui.setMsg={cls:'err',txt:'Invalid JSON: '+err.message};render();}
 }
 
-function bindTabs(){document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{view=t.dataset.view;ui.painOpen=false;$('scroll').scrollTop=0;render();try{localStorage.setItem(PREF_KEY,JSON.stringify({view}));}catch(e){}}));}
+function bindTabs(){document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{view=t.dataset.view;ui.painOpen=false;ui.detailDate=null;$('scroll').scrollTop=0;render();try{localStorage.setItem(PREF_KEY,JSON.stringify({view}));}catch(e){}}));}
 
 async function boot(){
   cfg=await loadConfig();
