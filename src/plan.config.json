@@ -1,0 +1,174 @@
+{
+  "_comment": "Full 18-week Disney walking-endurance plan. Encoded from disney_walking_master_plan.md and walk-plan-reference-data.json. Editable in Settings; an edited copy is stored as a localStorage override.",
+
+  "meta": {
+    "startDate": "2026-07-20",
+    "tripDate": "2026-11-16",
+    "tripDateIsPlaceholder": true,
+    "durationWeeks": 18,
+    "goal": "Two 20,000+ step park days with one recovery day between",
+    "location": "Charleston, SC",
+    "padEfficiency": 0.75,
+    "vestUnlockWeek": 3
+  },
+
+  "phases": [
+    {
+      "id": 1,
+      "name": "Base + Heat Management",
+      "weeks": [1, 6],
+      "dates": ["2026-07-20", "2026-08-30"],
+      "dailyStepTarget": { "min": 6000, "max": 7500, "mode": "ramp" },
+      "vestAllowed": true,
+      "sundayDefault": { "type": "rest_or_stroll", "min": 20, "note": "Rest or optional 20 min stroll" },
+      "notes": "Build daily steps 6,000 to 7,500. Walk early morning or after sunset. Heat management matters."
+    },
+    {
+      "id": 2,
+      "name": "Build",
+      "weeks": [7, 10],
+      "dates": ["2026-08-31", "2026-09-27"],
+      "dailyStepTarget": { "min": 8000, "max": 8500, "mode": "range" },
+      "vestAllowed": true,
+      "sundayDefault": { "type": "easy_walk", "min": 30, "note": "Easy 30 min walk" },
+      "notes": "Saturday walks now outdoors in park shoes."
+    },
+    {
+      "id": 3,
+      "name": "Peak / Trip Simulation",
+      "weeks": [11, 15],
+      "dates": ["2026-09-28", "2026-11-01"],
+      "dailyStepTarget": { "hold": 8500, "mode": "hold" },
+      "vestAllowed": true,
+      "sundayDefault": { "type": "easy_walk", "note": "Easy walk (duration per week)" },
+      "templateOverride": {
+        "mon": { "walking": { "type": "moderate_outdoor" }, "note": "Moderate outdoor walk replaces the pad walk (second park day)" },
+        "fri": { "strengthSets": 2, "note": "Friday Routine A drops to 2 sets to manage fatigue" }
+      },
+      "notes": "Weekend mimics the trip: hard Saturday, easy Sunday, moderate Monday."
+    },
+    {
+      "id": 4,
+      "name": "Taper",
+      "weeks": [16, 17],
+      "dates": ["2026-11-02", "2026-11-15"],
+      "dailyStepTarget": { "week16": 7500, "mode": "taper" },
+      "vestAllowed": false,
+      "sundayDefault": { "type": "easy_walk", "note": "Easy walk" },
+      "notes": "Arrive fresh. No hero walks."
+    }
+  ],
+
+  "weeklyTemplate": {
+    "mon": { "walking": { "type": "pad", "min": 45, "max": 60 }, "strength": "routineA" },
+    "tue": { "walking": { "type": "steps_only" }, "bike": true },
+    "wed": { "walking": { "type": "pad_or_outdoor", "min": 45 }, "strength": "routineB" },
+    "thu": { "walking": { "type": "steps_only" }, "strength": "microSet" },
+    "fri": { "walking": { "type": "steps_only" }, "strength": "routineA" },
+    "sat": { "walking": { "type": "long_walk" } },
+    "sun": { "walking": { "type": "phase_default" }, "bike": true }
+  },
+
+  "weeks": [
+    { "week": 1,  "phase": 1, "dates": ["2026-07-20", "2026-07-26"], "satLongMin": 45,  "progression": "Learn the routines, light effort" },
+    { "week": 2,  "phase": 1, "dates": ["2026-07-27", "2026-08-02"], "satLongMin": 50,  "progression": "Full sets and reps as written" },
+    { "week": 3,  "phase": 1, "dates": ["2026-08-03", "2026-08-09"], "satLongMin": 55,  "vestStart": true, "progression": "Vest may start on Mon/Wed pad walks, 5% bodyweight" },
+    { "week": 4,  "phase": 1, "dates": ["2026-08-10", "2026-08-16"], "satLongMin": 60,  "progression": "Balance work: try eyes closed" },
+    { "week": 5,  "phase": 1, "dates": ["2026-08-17", "2026-08-23"], "satLongMin": 65,  "progression": "Calf raises: move to single leg, 3 sets of 10 per leg" },
+    { "week": 6,  "phase": 1, "dates": ["2026-08-24", "2026-08-30"], "satLongMin": 70,  "deload": true, "progression": "Deload strength: 2 sets instead of 3 all week. Buy park shoes now." },
+    { "week": 7,  "phase": 2, "dates": ["2026-08-31", "2026-09-06"], "satLongMin": 75,  "progression": "Wednesday walk moves outdoors when weather allows" },
+    { "week": 8,  "phase": 2, "dates": ["2026-09-07", "2026-09-13"], "satLongMin": 80,  "progression": "Single leg calf raises: 3 sets of 12" },
+    { "week": 9,  "phase": 2, "dates": ["2026-09-14", "2026-09-20"], "satLongMin": 85,  "progression": "Vest to 10% bodyweight on pad if knee is quiet" },
+    { "week": 10, "phase": 2, "dates": ["2026-09-21", "2026-09-27"], "satLongMin": 90,  "progression": "Balance on folded towel. Step ups: 3 sets of 10." },
+    { "week": 11, "phase": 3, "dates": ["2026-09-28", "2026-10-04"], "satLongMin": 100, "sunEasyMin": 30, "monModerateMin": 60, "progression": "Add 2 or 3 deliberate 5 min standing stops during Sat walk" },
+    { "week": 12, "phase": 3, "dates": ["2026-10-05", "2026-10-11"], "satLongMin": 115, "sunEasyMin": 35, "monModerateMin": 60, "progression": "Standing stops continue every Saturday" },
+    { "week": 13, "phase": 3, "dates": ["2026-10-12", "2026-10-18"], "satLongMin": 130, "sunEasyMin": 40, "monModerateMin": 70, "progression": "Single leg calf raises: 3 sets of 15" },
+    { "week": 14, "phase": 3, "dates": ["2026-10-19", "2026-10-25"], "satLongMin": 140, "sunEasyMin": 45, "monModerateMin": 75, "deload": true, "progression": "Deload strength week: 2 sets everything" },
+    { "week": 15, "phase": 3, "dates": ["2026-10-26", "2026-11-01"], "satLongMin": 150, "sunEasyMin": 45, "monModerateMin": 75, "progression": "PEAK. Saturday dress rehearsal: park shoes, park socks, the bag you will carry." },
+    { "week": 16, "phase": 4, "dates": ["2026-11-02", "2026-11-08"], "satLongMin": 75,  "dailySteps": 7500, "progression": "Routines A and B once each, 2 sets. Daily steps 7,500." },
+    { "week": 17, "phase": 4, "dates": ["2026-11-09", "2026-11-15"], "satLongMin": null, "progression": "Two 30 to 45 min easy walks. One Routine B, 2 sets. No hero walks. Arrive fresh." }
+  ],
+
+  "routines": {
+    "routineA": {
+      "name": "Routine A · Strength",
+      "approxMin": 18,
+      "barefoot": true,
+      "exercises": [
+        { "name": "Standing calf raises (straight knee)", "sets": "3 × 15", "tempo": "Pause 1s at top, lower over 3s", "cue": "Pressure across the whole ball of the foot, biased to the big toe; heel rises straight up" },
+        { "name": "Bent knee calf raises", "sets": "3 × 12", "tempo": "Same tempo", "cue": "Knees bent ~20° held constant; targets the soleus" },
+        { "name": "Tibialis raises", "sets": "3 × 15", "tempo": "Lower slow", "cue": "Back against wall, heels 12in out, lift forefeet high" },
+        { "name": "Step ups", "sets": "3 × 8 each", "tempo": "Control the lowering", "cue": "Low step 6–8in; raise height only if the knee is pain-free" },
+        { "name": "Short foot holds", "sets": "3 × 10s each", "tempo": "Hold", "cue": "Pull ball of foot toward heel, arch lifts, toes stay flat" }
+      ]
+    },
+    "routineB": {
+      "name": "Routine B · Stability",
+      "approxMin": 18,
+      "barefoot": true,
+      "exercises": [
+        { "name": "Single leg balance", "sets": "3 × 30s each", "tempo": "Hold", "cue": "Progress: eyes closed, then folded towel" },
+        { "name": "Heel walks", "sets": "2 × 20 steps", "tempo": "Steady", "cue": "Toes pulled up" },
+        { "name": "Toe walks", "sets": "2 × 20 steps", "tempo": "Steady", "cue": "Heels high" },
+        { "name": "Towel scrunches", "sets": "3 × 15 each", "tempo": "Controlled", "cue": "Scrunch the towel toward you with the toes" },
+        { "name": "Lateral step downs", "sets": "2 × 8 each", "tempo": "Slow", "cue": "Slow heel tap to the floor, stop short of knee pain range" },
+        { "name": "Ankle alphabet", "sets": "1 round each", "tempo": "Full range", "cue": "Trace the alphabet with the foot" }
+      ]
+    },
+    "microSet": {
+      "name": "Micro set",
+      "approxMin": 4,
+      "barefoot": true,
+      "exercises": [
+        { "name": "Single leg balance", "sets": "3 × 30s", "cue": "Steady gaze, soft knee" },
+        { "name": "Short foot holds", "sets": "3 × 10s", "cue": "Lift the arch, toes flat" }
+      ]
+    }
+  },
+
+  "bike": {
+    "name": "Zone 2 spin",
+    "equipment": "Power Spin 290",
+    "effort": "Easy, conversational",
+    "days": ["tue", "sun"],
+    "logMode": "checkbox_plus_duration",
+    "note": "Aerobic base and active recovery. Keep it easy, especially Sunday."
+  },
+
+  "shoes": [
+    { "id": "training", "label": "Beast (training)", "model": "Brooks Beast GTS 26", "role": "daily and pad", "notes": "Stability, GuideRails, wide, for overpronation. Adrenaline GTS 25 is the lighter-support alternative." },
+    { "id": "park", "label": "Bondi 8 (park)", "model": "Hoka Bondi 8", "role": "park and long walk", "notes": "Reserved. Break-in from Sept 1 on Saturday outdoor walks only." },
+    { "id": "house", "label": "House (OluKai)", "model": "OluKai / Crocs", "role": "hard floors at home", "notes": "Supportive footbed to manage arch soreness on tile and hardwood." },
+    { "id": "other", "label": "Other", "model": "", "role": "", "notes": "" }
+  ],
+
+  "milestones": [
+    { "id": "vest-unlock",      "date": "2026-08-03", "label": "Weighted vest may start on pad walks (week 3, 5% bodyweight)" },
+    { "id": "buy-park-shoes",   "date": "2026-08-30", "label": "Park shoes bought by end of week 6" },
+    { "id": "park-shoe-breakin","date": "2026-09-01", "label": "Bondi 8 break-in begins on Saturday outdoor walks" },
+    { "id": "vest-full",        "date": "2026-09-14", "label": "Vest to 10% bodyweight on pad if the knee is quiet (week 9)" },
+    { "id": "dress-rehearsal",  "date": "2026-10-31", "label": "Peak dress rehearsal: park shoes, socks, and bag (week 15)" },
+    { "id": "trip",             "date": "2026-11-16", "label": "Trip: two 20,000+ step park days" }
+  ],
+
+  "painFlagTypes": [
+    { "id": "left_knee", "label": "Left knee" },
+    { "id": "foot_arch_morning", "label": "Morning arch/heel" },
+    { "id": "shin_walk", "label": "Shin (walking)" },
+    { "id": "other", "label": "Other" }
+  ],
+
+  "standingRules": [
+    "Left knee sharp pain = stop that exercise. Aching that fades in 24h = fine. Growing week over week = see a PT.",
+    "Carbs before any walk over 45 min. Electrolytes on every outdoor walk.",
+    "Saturday long walks outdoors in park shoes from Sept 1.",
+    "Vest: pad only, 5–10% bodyweight, not on Saturday walks before October, off if the knee complains.",
+    "Hard floors at home: supportive house shoes, not barefoot. Routines on a mat, not tile.",
+    "Morning arch or heel pain, or shin pain that does not warm up in 10 min: pause and cut volume 50% for a week."
+  ],
+
+  "rules": {
+    "kneeBannerThreshold": 3,
+    "kneeStopRule": "If left knee pain reaches 3 of 5 during a walk, stop and log it. Do not push through in this phase."
+  }
+}
