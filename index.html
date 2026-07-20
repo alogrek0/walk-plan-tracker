@@ -76,6 +76,10 @@
   .ex-name{font-size:14.5px;color:var(--ink);}
   .ex-cue{font-size:12.5px;color:var(--dim);font-style:italic;margin-top:2px;}
   .ex-sets{font-size:13.5px;color:var(--gold);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .ex-check{cursor:pointer;align-items:center;}
+  .ex-box{width:19px;height:19px;border-radius:50%;border:1.5px solid #6f685c;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:.15s;}
+  .ex-check.done .ex-box{border-color:var(--gold-b);color:var(--gold);}
+  .ex-check.done .ex-name{color:var(--muted);}
   .bike-min{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:10px 16px 12px;}
   .bike-min label{font-size:12px;color:var(--dim);letter-spacing:.6px;text-transform:uppercase;}
   .bike-min input{width:74px;background:transparent;border:1px solid var(--line);border-radius:4px;color:var(--ink);font-family:var(--serif);font-size:18px;padding:6px 10px;font-variant-numeric:tabular-nums;outline:none;}
@@ -225,7 +229,7 @@ function allLogs(){return new Promise(res=>{const q=store('readonly').getAll();q
 function clearLogs(){return new Promise(res=>{const q=store('readwrite').clear();q.onsuccess=()=>res();q.onerror=()=>res();});}
 
 async function loadConfig(){const ov=localStorage.getItem(CFG_KEY);if(ov){try{return JSON.parse(ov);}catch(e){}}const r=await fetch('./src/plan.config.json',{cache:'no-cache'});return r.json();}
-function blankLog(d){return{date:d,sessionsCompleted:[],steps:null,walkMinutes:null,surface:null,shoes:null,bike:{done:false,minutes:null},painFlags:[],notes:'',completedAt:{},bannerDismissed:false};}
+function blankLog(d){return{date:d,sessionsCompleted:[],exDone:{},steps:null,walkMinutes:null,surface:null,shoes:null,bike:{done:false,minutes:null},painFlags:[],notes:'',completedAt:{},bannerDismissed:false};}
 const persist=()=>putLog(log);
 
 function weekNumFor(d){return Math.floor(dayDiff(cfg.meta.startDate,d)/7)+1;}
@@ -287,14 +291,19 @@ function renderToday(){
     h+='<div class="session'+(done?' done':'')+'">';
     h+='<div class="session-row" data-action="toggle-session" data-id="'+it.id+'"'+(it.kind==='strength'?' data-routine="'+it.routineKey+'"':'')+'>';
     h+='<div class="check" data-check="'+it.id+'">'+(done?'✓':'')+'</div>';
-    h+='<div class="s-body"><div class="s-name">'+esc(it.title)+'</div><div class="s-meta">'+esc(it.meta)+'</div>'
+    const exdCur=(log.exDone&&log.exDone[it.id])||[];
+    const metaExtra=(it.kind==='strength'&&exdCur.length)?' · '+exdCur.length+'/'+cfg.routines[it.routineKey].exercises.length+' done':'';
+    h+='<div class="s-body"><div class="s-name">'+esc(it.title)+'</div><div class="s-meta">'+esc(it.meta+metaExtra)+'</div>'
       +(it.note?'<div class="s-note">'+esc(it.note)+'</div>':'')+'</div>';
     if(it.kind==='strength')h+='<div class="chev">'+(ui.routineOpen[it.routineKey]?'▴':'▾')+'</div>';
     h+='</div>';
     if(it.kind==='strength'){
       const r=cfg.routines[it.routineKey];
       h+='<div class="exlist"'+(ui.routineOpen[it.routineKey]?'':' hidden')+'>';
-      r.exercises.forEach(ex=>{h+='<div class="ex"><div style="flex:1"><div class="ex-name">'+esc(ex.name)+'</div>'
+      r.exercises.forEach((ex,idx)=>{const ed=exdCur.includes(idx);
+        h+='<div class="ex ex-check'+(ed?' done':'')+'" data-action="toggle-ex" data-id="'+it.id+'" data-routine="'+it.routineKey+'" data-idx="'+idx+'">'
+        +'<div class="ex-box">'+(ed?'✓':'')+'</div>'
+        +'<div style="flex:1"><div class="ex-name">'+esc(ex.name)+'</div>'
         +(ex.cue?'<div class="ex-cue">'+esc(ex.cue)+'</div>':'')+'</div><div class="ex-sets">'+esc(ex.sets)+'</div></div>';});
       h+='</div>';
     }
@@ -438,19 +447,38 @@ function render(){
   ui.setMsg=null;
 }
 
+function syncRoutine(id,rk){
+  const r=cfg.routines[rk]; if(!r)return;
+  const exd=(log.exDone&&log.exDone[id])||[];
+  const all=r.exercises.length>0 && exd.length>=r.exercises.length;
+  const i=log.sessionsCompleted.indexOf(id);
+  if(all&&i<0){log.sessionsCompleted.push(id);log.completedAt=log.completedAt||{};log.completedAt[rk]=new Date().toISOString();}
+  else if(!all&&i>=0){log.sessionsCompleted.splice(i,1);}
+}
 async function onClick(e){
   const a=e.target.closest('[data-action]');
   if(!a)return;
   const act=a.dataset.action;
   if(act==='toggle-session'){
-    if(a.dataset.routine){
+    const id=a.dataset.id, rk=a.dataset.routine;
+    if(rk){
       const isCheck=e.target.classList.contains('check');
-      if(!isCheck){ui.routineOpen[a.dataset.routine]=!ui.routineOpen[a.dataset.routine];render();return;}
+      if(!isCheck){ui.routineOpen[rk]=!ui.routineOpen[rk];render();return;}
+      const r=cfg.routines[rk];log.exDone=log.exDone||{};
+      const exd=log.exDone[id]||[];
+      log.exDone[id]=(exd.length>=r.exercises.length)?[]:r.exercises.map((_,i)=>i);
+      syncRoutine(id,rk);await persist();render();return;
     }
-    const id=a.dataset.id,i=log.sessionsCompleted.indexOf(id);
-    if(i>=0)log.sessionsCompleted.splice(i,1);
-    else{log.sessionsCompleted.push(id);if(a.dataset.routine)log.completedAt[a.dataset.routine]=new Date().toISOString();}
+    const i=log.sessionsCompleted.indexOf(id);
+    if(i>=0)log.sessionsCompleted.splice(i,1);else log.sessionsCompleted.push(id);
     await persist();render();return;
+  }
+  if(act==='toggle-ex'){
+    const id=a.dataset.id, rk=a.dataset.routine, idx=+a.dataset.idx;
+    log.exDone=log.exDone||{};
+    const arr=log.exDone[id]||(log.exDone[id]=[]);
+    const p=arr.indexOf(idx); if(p>=0)arr.splice(p,1);else arr.push(idx);
+    syncRoutine(id,rk);await persist();render();return;
   }
   if(act==='dismiss-banner'){log.bannerDismissed=true;await persist();render();return;}
   if(act==='day-detail'){ui.detailDate=a.dataset.date;$('scroll').scrollTop=0;render();return;}
