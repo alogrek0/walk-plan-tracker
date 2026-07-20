@@ -254,7 +254,7 @@ function deriveDay(d){
   const skey=tpl.strength;
   if(skey&&cfg.routines[skey]){const r=cfg.routines[skey];let note='';if(ov.strengthSets)note='2 sets this week';else if(week&&week.deload)note='Deload · 2 sets';
     items.push({id:dow+'-'+skey,kind:'strength',routineKey:skey,title:r.name,meta:r.exercises.length+' exercises · ~'+r.approxMin+' min',note});}
-  if(ov.bike!==false&&tpl.bike)items.push({id:dow+'-bike',kind:'bike',title:cfg.bike.name,meta:'easy · '+cfg.bike.equipment});
+  if(ov.bike!==false&&tpl.bike){const bd=cfg.bike.durationByPhase&&cfg.bike.durationByPhase[phase.id]&&cfg.bike.durationByPhase[phase.id][dow];items.push({id:dow+'-bike',kind:'bike',title:cfg.bike.name,meta:'easy · '+(bd?bd+' min · ':'')+cfg.bike.equipment});}
   return {dow,weekNum:wRaw,phase,week,items,dt};
 }
 

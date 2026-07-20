@@ -132,7 +132,13 @@
     "effort": "Easy, conversational",
     "days": ["tue", "sun"],
     "logMode": "checkbox_plus_duration",
-    "note": "Aerobic base and active recovery. Keep it easy, especially Sunday."
+    "durationByPhase": {
+      "1": { "tue": 40, "sun": 30 },
+      "2": { "tue": 50, "sun": 30 },
+      "3": { "tue": 60, "sun": 25 },
+      "4": { "tue": 30, "sun": 20 }
+    },
+    "note": "Two easy Zone 2 rides. Tuesday is the longer aerobic-base ride and lengthens across phases (40 to 60 min) to build mitochondrial density on a non-walking day; Sunday stays short and shrinks as the Saturday long walks peak, so it remains true recovery. Taper pulls both down. Always conversational effort."
   },
 
   "shoes": [
